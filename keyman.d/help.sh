@@ -1,0 +1,22 @@
+
+# Help text
+HELP_TEXT=$(cat <<'EOF'
+keyman — SSH keys + GPG keys manager (POSIX sh)
+
+Usage:
+  keyman            Run interactive UI
+  keyman -h|--help  Show help
+  keyman -v|--version  Show version
+
+Features:
+  SSH:  List, show details, create (ed25519/rsa/ecdsa), delete key pairs
+  GPG:  List, create, export public key, delete signing keys
+
+Environment:
+  SSH_DIR     Override SSH directory (default: ~/.ssh)
+  NO_COLOR    Disable colors if set
+  KEYMAN_LOG  Enable audit logging: 'syslog' or a file path
+
+Dependencies: openssh-client, gnupg, mktemp (coreutils)
+EOF
+)
