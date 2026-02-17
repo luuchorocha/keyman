@@ -3,12 +3,14 @@
 
 # ----------------- SSH helpers -----------------
 
+# Ensure SSH_DIR exists with secure permissions (700).
+# Prompts user for confirmation before creating.
 ssh_dir_ensure() {
   if [ ! -d "$SSH_DIR" ]; then
     ui_screen "SSH"
     warn "SSH directory '$SSH_DIR' does not exist."
     if confirm "Create it with 700 permissions?"; then
-      umask 077
+      umask 077  # Restrict permissions for new directory
       mkdir -p "$SSH_DIR" || return 1
       chmod 700 "$SSH_DIR" || true
       ok "Created '$SSH_DIR'."
@@ -26,7 +28,7 @@ ssh_list_pub_keys() {
 }
 
 ssh_normalize_key_paths() {
-  inp="$(expand_tilde_home $(strip_wrapping_quotes "$1"))"
+  inp="$(expand_tilde_home "$(strip_wrapping_quotes "$1")")"
 
   if [ -n "$inp" ] && [ "${inp#/}" = "$inp" ]; then
     if [ -f "$SSH_DIR/$inp" ]; then
@@ -59,25 +61,29 @@ ssh_normalize_key_paths() {
   printf '%s|%s' "$pub" "$priv"
 }
 
+# Print the fingerprint of an SSH public key file.
+# Tries SHA256 first, falls back to default hash if unavailable.
 ssh_print_fingerprint() {
   pub="$1"
   [ -f "$pub" ] || { warn "Public key file not found: $pub"; return 1; }
 
   require_cmd ssh-keygen openssh-client || return 1
 
-  if outp="$(ssh-keygen -l -E sha256 -f "$pub" 2>&1)"; then
-    printf '%s\n' "$outp"
+  # Try SHA256 fingerprint (modern ssh-keygen)
+  if fingerprint="$(ssh-keygen -l -E sha256 -f "$pub" 2>&1)"; then
+    printf '%s\n' "$fingerprint"
     return 0
   fi
 
+  # Fallback for older ssh-keygen without -E flag
   warn "Could not compute SHA256 fingerprint (ssh-keygen -E may be unsupported). Falling back."
-  if outp2="$(ssh-keygen -l -f "$pub" 2>&1)"; then
-    printf '%s\n' "$outp2"
+  if fingerprint="$(ssh-keygen -l -f "$pub" 2>&1)"; then
+    printf '%s\n' "$fingerprint"
     return 0
   fi
 
   err "Failed to compute fingerprint."
-  printf '%s\n' "$outp2"
+  printf '%s\n' "$fingerprint"
   return 1
 }
 
@@ -113,6 +119,7 @@ ssh_table_and_select_pub() {
       comment="$(awk 'NR==1{print $3; exit}' "$pub" 2>/dev/null || true)"
     fi
 
+    # Variables with _t suffix are truncated for table display
     pub_t="$(truncate "$pub" 54)"
     type_t="$(truncate "$type" 12)"
     comment_t="$(truncate "$comment" 31)"
@@ -220,12 +227,14 @@ ssh_remove_pair() {
   pub="${paths%%|*}"
   priv="${paths#*|}"
 
+  # Security: Validate paths are within SSH_DIR to prevent accidental deletion
+  # of files outside the expected directory (path traversal protection).
   case "$pub" in
-    "$SSH_DIR"/*) : ;;
+    "$SSH_DIR"/*) : ;;  # Safe - inside SSH_DIR
     *) ui_screen "SSH · Delete Key Pair"; warn "Refusing to delete outside SSH_DIR: $pub"; pause; return 1 ;;
   esac
   case "$priv" in
-    "$SSH_DIR"/*) : ;;
+    "$SSH_DIR"/*) : ;;  # Safe - inside SSH_DIR
     *) ui_screen "SSH · Delete Key Pair"; warn "Refusing to delete outside SSH_DIR: $priv"; pause; return 1 ;;
   esac
 

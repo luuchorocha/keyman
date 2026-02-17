@@ -1,5 +1,8 @@
 # keyman/ui.sh — UI components
 # Sourced by keyman main script
+#
+# All UI output goes to /dev/tty (or stderr) via ui_print/ui_println.
+# This keeps stdout clean for return values via command substitution.
 
 # ----------------- Screen drawing -----------------
 

@@ -3,8 +3,10 @@
 
 # ----------------- GPG helpers -----------------
 
+# Parse GPG secret keys into tab-separated rows for table display.
+# Output format: keyid \t algo \t size \t created \t expires \t uid
+# Uses --with-colons format: sec lines have key metadata, uid lines have user ID.
 gpg_key_rows() {
-  # Output: keyid \t algo \t size \t created \t expires \t uid
   gpg --list-secret-keys --with-colons --fixed-list-mode --keyid-format=long 2>/dev/null \
   | awk -F: '
       $1=="sec" {
@@ -19,24 +21,26 @@ gpg_key_rows() {
     '
 }
 
+# Convert GPG algorithm number to human-readable name.
+# Numbers are from RFC 4880 Section 9.1 (Public-Key Algorithms).
 gpg_algo_name() {
   case "$1" in
-    1)  printf 'RSA' ;;
-    16) printf 'Elgamal' ;;
-    17) printf 'DSA' ;;
-    18) printf 'ECDH' ;;
-    19) printf 'ECDSA' ;;
-    22) printf 'EdDSA' ;;
-    *)  printf 'algo:%s' "$1" ;;
+    1)  printf 'RSA' ;;      # RSA (Encrypt or Sign)
+    16) printf 'Elgamal' ;;  # Elgamal (Encrypt-Only)
+    17) printf 'DSA' ;;      # DSA (Sign-Only)
+    18) printf 'ECDH' ;;     # Elliptic Curve Diffie-Hellman
+    19) printf 'ECDSA' ;;    # Elliptic Curve DSA
+    22) printf 'EdDSA' ;;    # Edwards-curve DSA (Ed25519)
+    *)  printf 'algo:%s' "$1" ;;  # Unknown, show raw number
   esac
 }
 
+# Format a Unix timestamp to YYYY-MM-DD, or '-' if empty.
+# Falls back to raw timestamp if date command fails (e.g., BSD).
 gpg_format_date() {
   ts="$1"
   [ -z "$ts" ] && { printf '-'; return; }
-  if date -d "@$ts" '+%Y-%m-%d' 2>/dev/null; then
-    return
-  fi
+  formatted="$(date -d "@$ts" '+%Y-%m-%d' 2>/dev/null)" && { printf '%s' "$formatted"; return; }
   # fallback: just show timestamp
   printf '%s' "$ts"
 }
@@ -76,6 +80,7 @@ gpg_choose_signing_key() {
     created="$(gpg_format_date "$created_ts")"
     expires="$(gpg_format_date "$expires_ts")"
 
+    # Variables with _t suffix are truncated for table display
     keyid_t="$(truncate "$keyid" 18)"
     algo_t="$(truncate "$algo" 12)"
     uid_t="$(truncate "$uid" 38)"

@@ -34,6 +34,8 @@ supports_color() {
   return 0
 }
 
+# Initialize color escape codes. Call once at startup.
+# Sets C_BOLD, C_DIM, C_RED, etc. to ANSI codes or empty strings.
 init_colors() {
   if supports_color; then
     C_BOLD="$(printf '\033[1m')"
@@ -59,7 +61,11 @@ ok() { ui_println "  ${C_GRN}✓${C_RST}  $*"; }
 warn() { ui_println "  ${C_YEL}⚠${C_RST}  $*"; }
 err() { ui_println "  ${C_RED}✗${C_RST}  $*"; }
 
-# Audit logging for security-sensitive operations
+# Audit logging for security-sensitive operations (create, delete).
+# Controlled by KEYMAN_LOG env var:
+#   - 'syslog': log via logger(1) to auth.info facility
+#   - <path>:  append to specified file
+#   - empty:   disabled (no-op)
 audit_log() {
   [ -z "$KEYMAN_LOG" ] && return 0
   timestamp="$(date '+%Y-%m-%d %H:%M:%S %z')"
@@ -71,7 +77,7 @@ audit_log() {
         logger -t keyman -p auth.info "user=$user $*"
       fi
       ;;
-    *)
+    *)  # Treat as file path
       printf '%s\n' "$msg" >>"$KEYMAN_LOG" 2>/dev/null || true
       ;;
   esac
@@ -97,13 +103,16 @@ is_int() {
   esac
 }
 
+# Create a secure temporary file with restricted permissions.
+# Always use this instead of mktemp directly to ensure 600 mode.
+# Returns: path to temp file on stdout.
 mktemp_safe() {
   if ! command -v mktemp >/dev/null 2>&1; then
     err "Required command 'mktemp' not found."
     return 1
   fi
   tmp="$(mktemp "${TMPDIR:-/tmp}/keyman.XXXXXX")" || return 1
-  chmod 600 "$tmp" 2>/dev/null || true
+  chmod 600 "$tmp" 2>/dev/null || true  # Ensure only owner can read/write
   printf '%s' "$tmp"
 }
 
@@ -123,13 +132,15 @@ expand_tilde_home() {
   esac
 }
 
+# Truncate string to n characters, adding "..." suffix if truncated.
+# Used for table columns to ensure alignment.
 truncate() {
   s="$1"
   n="$2"
   printf '%s' "$s" | awk -v n="$n" '{
-    if (length($0) <= n) { print $0; next }
-    if (n <= 3) { print substr($0,1,n); next }
-    print substr($0,1,n-3) "..."
+    if (length($0) <= n) { print $0; next }  # Fits, no truncation
+    if (n <= 3) { print substr($0,1,n); next }  # Too short for ellipsis
+    print substr($0,1,n-3) "..."  # Truncate with ellipsis
   }'
 }
 
