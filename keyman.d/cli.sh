@@ -1,4 +1,4 @@
-#!/bin/sh #asdasd
+# ----------------- CLI helpers -----------------
 
 check_arguments() {
   case ${1:-} in

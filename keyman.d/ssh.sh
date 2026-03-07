@@ -1,6 +1,3 @@
-# keyman/ssh.sh — SSH key management
-# Sourced by keyman main script
-
 # ----------------- SSH helpers -----------------
 
 # Ensure SSH_DIR exists with secure permissions (700).

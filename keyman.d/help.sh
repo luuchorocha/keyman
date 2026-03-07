@@ -1,5 +1,4 @@
-
-# Help text
+# ----------------- Help -----------------
 
 HELP_TEXT=$(cat <<EOF
 keyman $VERSION — SSH and GPG manager

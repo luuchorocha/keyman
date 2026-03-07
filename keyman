@@ -1,14 +1,13 @@
 #!/bin/sh
-# keyman — SSH keys + GPG keys manager (POSIX sh)
 
 set -u
 
 SSH_DIR="${SSH_DIR:-"$HOME/.ssh"}"
-KEYMAN_LOG="${KEYMAN_LOG:-}"  # Set to 'syslog' or a file path to enable audit logging
+KEYMAN_LOG="${KEYMAN_LOG:-syslog}"
 NO_COLOR="${NO_COLOR:-}"
 KEYMAN_DIR="$(cd "$(dirname "$(realpath $0)")" && pwd)"
 KEYMAN_LIB="$KEYMAN_DIR/keyman.d"
-VERSION=$(cat "$KEYMAN_LIB/VERSION")
+VERSION="$(cat "$KEYMAN_LIB/VERSION")"
 
 trap cleanup EXIT
 trap interrupt INT TERM
@@ -33,11 +32,12 @@ load() {
   fi
 }
 
-load "core.sh"
 load "help.sh"
+load "cli.sh"
+load "core.sh"
 load "ui.sh"
 load "ssh.sh"
-load "gpg.sh"
+load "gpg.sh" 
 load "menu.sh"
 
 main_menu $@

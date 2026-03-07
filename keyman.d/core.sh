@@ -1,7 +1,5 @@
-# keyman/core.sh — Core utilities and helpers
-# Sourced by keyman main script
-
 # ----------------- IO model -----------------
+
 # UI output: /dev/tty when available, otherwise stderr.
 # Return values: stdout ONLY (so command substitution is reliable).
 

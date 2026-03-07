@@ -1,6 +1,3 @@
-# keyman/gpg.sh — GPG key management
-# Sourced by keyman main script
-
 # ----------------- GPG helpers -----------------
 
 # Parse GPG secret keys into tab-separated rows for table display.
