@@ -1,4 +1,5 @@
 main_menu() {
+  check_arguments $@
   init_colors
 
   while :; do

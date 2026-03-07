@@ -3,12 +3,24 @@
 
 set -u
 
-VERSION='1.3.0'
 SSH_DIR="${SSH_DIR:-"$HOME/.ssh"}"
 KEYMAN_LOG="${KEYMAN_LOG:-}"  # Set to 'syslog' or a file path to enable audit logging
 NO_COLOR="${NO_COLOR:-}"
-KEYMAN_DIR="$(cd "$(dirname "$0")" && pwd)"
+KEYMAN_DIR="$(cd "$(dirname "$(realpath $0)")" && pwd)"
 KEYMAN_LIB="$KEYMAN_DIR/keyman.d"
+VERSION=$(cat "$KEYMAN_LIB/VERSION")
+
+trap cleanup EXIT
+trap interrupt INT TERM
+
+cleanup() {
+  rm -f "${TMPDIR:-/tmp}"/keyman.* 2>/dev/null
+}
+
+interrupt() {
+  cleanup
+  exit 130
+}
 
 load() {
   module="$1"
@@ -21,13 +33,6 @@ load() {
   fi
 }
 
-cleanup() {
-  rm -f "${TMPDIR:-/tmp}"/keyman.* 2>/dev/null
-}
-
-trap cleanup EXIT
-trap 'cleanup; exit 130' INT TERM
-
 load "core.sh"
 load "help.sh"
 load "ui.sh"
@@ -35,11 +40,4 @@ load "ssh.sh"
 load "gpg.sh"
 load "menu.sh"
 
-case "${1:-}" in
-  -h|--help) printf '%s\n' "$HELP_TEXT"; exit 0 ;;
-  -v|--version) printf 'keyman %s\n' "$VERSION"; exit 0 ;;
-  '') : ;;
-  *) printf 'error: unknown option: %s\nRun: %s --help\n' "$1" "$0" >&2; exit 2 ;;
-esac
-
-main_menu
+main_menu $@

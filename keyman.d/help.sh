@@ -1,7 +1,8 @@
 
 # Help text
-HELP_TEXT=$(cat <<'EOF'
-keyman — SSH keys + GPG keys manager (POSIX sh)
+
+HELP_TEXT=$(cat <<EOF
+keyman $VERSION — SSH and GPG manager
 
 Usage:
   keyman            Run interactive UI
