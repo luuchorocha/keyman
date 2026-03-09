@@ -311,7 +311,7 @@ ssh_menu() {
     ui_println ""
     ui_line
 
-    prompt "  ${C_CYN}▸${C_RST} Select: "
+    menu_prompt "  ${C_CYN}▸${C_RST} Select: "
 
     case "$REPLY" in
       1) ssh_show_details ;;

@@ -3,9 +3,9 @@
 set -u
 
 SSH_DIR="${SSH_DIR:-"$HOME/.ssh"}"
-KEYMAN_LOG="${KEYMAN_LOG:-syslog}"
+KEYMAN_LOG="${KEYMAN_LOG:-}"
 NO_COLOR="${NO_COLOR:-}"
-KEYMAN_DIR="$(cd "$(dirname "$(realpath $0)")" && pwd)"
+KEYMAN_DIR="${KEYMAN_DIR:-$(cd "$(dirname "$(realpath $0)")" && pwd)}"
 KEYMAN_LIB="$KEYMAN_DIR/keyman.d"
 VERSION="$(cat "$KEYMAN_LIB/VERSION")"
 
@@ -13,6 +13,9 @@ trap cleanup EXIT
 trap interrupt INT TERM
 
 cleanup() {
+  if command -v restore_tty >/dev/null 2>&1; then
+    restore_tty
+  fi
   rm -f "${TMPDIR:-/tmp}"/keyman.* 2>/dev/null
 }
 
@@ -40,4 +43,5 @@ load "ssh.sh"
 load "gpg.sh" 
 load "menu.sh"
 
+check_arguments $@
 main_menu $@
