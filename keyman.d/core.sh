@@ -32,32 +32,58 @@ supports_color() {
   return 0
 }
 
-# Initialize color escape codes. Call once at startup.
-# Sets C_BOLD, C_DIM, C_RED, etc. to ANSI codes or empty strings.
+# Initialize semantic color roles and legacy aliases.
 init_colors() {
   if supports_color; then
-    C_BOLD="$(printf '\033[1m')"
-    C_DIM="$(printf '\033[2m')"
-    C_ULINE="$(printf '\033[4m')"
-    C_RED="$(printf '\033[31m')"
-    C_GRN="$(printf '\033[32m')"
-    C_YEL="$(printf '\033[33m')"
-    C_BLU="$(printf '\033[34m')"
-    C_MAG="$(printf '\033[35m')"
-    C_CYN="$(printf '\033[36m')"
-    C_WHT="$(printf '\033[37m')"
-    C_RST="$(printf '\033[0m')"
+    UI_STYLE_BOLD="$(printf '\033[1m')"
+    UI_STYLE_DIM="$(printf '\033[2m')"
+    UI_STYLE_UNDERLINE="$(printf '\033[4m')"
+    UI_STYLE_RESET="$(printf '\033[0m')"
+    UI_COLOR_ACCENT="$(printf '\033[36m')"
+    UI_COLOR_INFO="$(printf '\033[34m')"
+    UI_COLOR_SUCCESS="$(printf '\033[32m')"
+    UI_COLOR_WARNING="$(printf '\033[33m')"
+    UI_COLOR_DANGER="$(printf '\033[31m')"
+    UI_COLOR_MUTED="$UI_STYLE_DIM"
+    UI_COLOR_DETAIL="$(printf '\033[35m')"
   else
-    C_BOLD='' C_DIM='' C_ULINE='' C_RED='' C_GRN='' C_YEL='' C_BLU='' C_MAG='' C_CYN='' C_WHT='' C_RST=''
+    UI_STYLE_BOLD=''
+    UI_STYLE_DIM=''
+    UI_STYLE_UNDERLINE=''
+    UI_STYLE_RESET=''
+    UI_COLOR_ACCENT=''
+    UI_COLOR_INFO=''
+    UI_COLOR_SUCCESS=''
+    UI_COLOR_WARNING=''
+    UI_COLOR_DANGER=''
+    UI_COLOR_MUTED=''
+    UI_COLOR_DETAIL=''
   fi
+
+  C_BOLD=$UI_STYLE_BOLD
+  C_DIM=$UI_STYLE_DIM
+  C_ULINE=$UI_STYLE_UNDERLINE
+  C_RED=$UI_COLOR_DANGER
+  C_GRN=$UI_COLOR_SUCCESS
+  C_YEL=$UI_COLOR_WARNING
+  C_BLU=$UI_COLOR_INFO
+  C_MAG=$UI_COLOR_DETAIL
+  C_CYN=$UI_COLOR_ACCENT
+  C_WHT=''
+  C_RST=$UI_STYLE_RESET
 }
 
 # ----------------- Logging -----------------
 
-info() { ui_println "  ${C_CYN}ℹ${C_RST}  $*"; }
-ok() { ui_println "  ${C_GRN}✓${C_RST}  $*"; }
-warn() { ui_println "  ${C_YEL}⚠${C_RST}  $*"; }
-err() { ui_println "  ${C_RED}✗${C_RST}  $*"; }
+ui_info() { ui_println "  ${UI_COLOR_INFO}[i]${UI_STYLE_RESET} $*"; }
+ui_success() { ui_println "  ${UI_COLOR_SUCCESS}[+]${UI_STYLE_RESET} $*"; }
+ui_warning() { ui_println "  ${UI_COLOR_WARNING}[!]${UI_STYLE_RESET} $*"; }
+ui_error() { ui_println "  ${UI_COLOR_DANGER}[x]${UI_STYLE_RESET} $*"; }
+
+info() { ui_info "$@"; }
+ok() { ui_success "$@"; }
+warn() { ui_warning "$@"; }
+err() { ui_error "$@"; }
 
 # Audit logging for security-sensitive operations (create, delete).
 # Controlled by KEYMAN_LOG env var:

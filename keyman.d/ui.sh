@@ -1,13 +1,13 @@
 # ----------------- UI helpers -----------------
 
 ui_line() {
-  ui_println "${C_DIM}────────────────────────────────────────────────────────────────────────────────────────────────────${C_RST}"
+  ui_println "  ${C_DIM}-------------------------------------------------------------------------------${C_RST}"
 }
 
 ui_section() {
   ui_println ""
   ui_println "  ${C_CYN}${C_BOLD}$1${C_RST}"
-  ui_println "  ${C_DIM}────────────────────────────────────────────────────────────────────────────────────────────────${C_RST}"
+  ui_println "  ${C_DIM}-----------------------------------------------------------------------${C_RST}"
 }
 
 ui_clear() {
@@ -27,12 +27,25 @@ ui_screen() {
 
   ui_clear
   ui_println ""
-  ui_println "  ${C_CYN}${C_BOLD}🔑 keyman${C_RST}  ${C_DIM}v$VERSION${C_RST}"
+  ui_println "  ${C_CYN}${C_BOLD}keyman${C_RST}  ${C_DIM}v$VERSION${C_RST}"
+  ui_println "  ${C_DIM}SSH and GPG key manager${C_RST}"
   ui_line
 
   if [ -n "$title" ]; then
     ui_println ""
     ui_println "  ${C_BLU}${C_BOLD}$title${C_RST}"
+  fi
+}
+
+ui_menu_row() {
+  key="$1"
+  label="$2"
+  detail="${3:-}"
+
+  if [ -n "$detail" ]; then
+    ui_println "  ${C_CYN}${C_BOLD}$key${C_RST}  ${C_DIM}|${C_RST}  ${C_BOLD}$label${C_RST}  ${C_DIM}- $detail${C_RST}"
+  else
+    ui_println "  ${C_CYN}${C_BOLD}$key${C_RST}  ${C_DIM}|${C_RST}  ${C_BOLD}$label${C_RST}"
   fi
 }
 
@@ -102,6 +115,10 @@ prompt_key() {
 menu_prompt() {
   prompt_key "$1"
   REPLY="$(printf '%s' "$REPLY" | tr '[:upper:]' '[:lower:]')"
+}
+
+ui_prompt_select() {
+  menu_prompt "  ${C_CYN}>${C_RST} ${1:-Select}: "
 }
 
 pause() {

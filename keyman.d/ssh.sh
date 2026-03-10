@@ -131,7 +131,7 @@ ssh_table_and_select_pub() {
   ui_println ""
   ui_line
   while :; do
-    prompt "  ${C_CYN}▸${C_RST} Select by number (or paste a key path): "
+    prompt "  ${C_CYN}>${C_RST} Select by number (or paste a key path): "
     ans="$(strip_wrapping_quotes "$REPLY")"
     ans="$(trim "$ans")"
 
@@ -303,15 +303,15 @@ ssh_menu() {
   while :; do
     ui_screen "SSH Keys"
     ui_println ""
-    ui_println "  ${C_CYN}1${C_RST}  ${C_DIM}│${C_RST}  Show key details"
-    ui_println "  ${C_CYN}2${C_RST}  ${C_DIM}│${C_RST}  Delete a key pair"
-    ui_println "  ${C_CYN}3${C_RST}  ${C_DIM}│${C_RST}  Create a new key pair"
+    ui_menu_row "1" "Show key details" "Inspect paths, fingerprint, and public key"
+    ui_menu_row "2" "Delete a key pair" "Remove a key pair inside SSH_DIR"
+    ui_menu_row "3" "Create a new key pair" "Run ssh-keygen with guided defaults"
     ui_println ""
-    ui_println "  ${C_DIM}0${C_RST}  ${C_DIM}│${C_RST}  ${C_DIM}Back${C_RST}"
+    ui_println "  ${C_DIM}0${C_RST}  ${C_DIM}|${C_RST}  ${C_DIM}Back${C_RST}"
     ui_println ""
     ui_line
 
-    menu_prompt "  ${C_CYN}▸${C_RST} Select: "
+    ui_prompt_select "Select"
 
     case "$REPLY" in
       1) ssh_show_details ;;

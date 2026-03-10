@@ -93,7 +93,7 @@ gpg_choose_signing_key() {
   ui_println ""
   ui_line
   while :; do
-    prompt "  ${C_CYN}▸${C_RST} Select by number (or paste key id/fingerprint/email): "
+    prompt "  ${C_CYN}>${C_RST} Select by number (or paste key id, fingerprint, or email): "
     ans="$(strip_wrapping_quotes "$REPLY")"
     ans="$(trim "$ans")"
 
@@ -236,15 +236,15 @@ gpg_menu() {
   while :; do
     ui_screen "GPG Keys"
     ui_println ""
-    ui_println "  ${C_CYN}1${C_RST}  ${C_DIM}│${C_RST}  Show key details"
-    ui_println "  ${C_CYN}2${C_RST}  ${C_DIM}│${C_RST}  Create a new key"
-    ui_println "  ${C_CYN}3${C_RST}  ${C_DIM}│${C_RST}  Delete a key"
+    ui_menu_row "1" "Show key details" "Inspect metadata, fingerprint, and public key"
+    ui_menu_row "2" "Create a new key" "Launch GPG's interactive key generation flow"
+    ui_menu_row "3" "Delete a key" "Remove a local signing key after confirmation"
     ui_println ""
-    ui_println "  ${C_DIM}0${C_RST}  ${C_DIM}│${C_RST}  ${C_DIM}Back${C_RST}"
+    ui_println "  ${C_DIM}0${C_RST}  ${C_DIM}|${C_RST}  ${C_DIM}Back${C_RST}"
     ui_println ""
     ui_line
 
-    menu_prompt "  ${C_CYN}▸${C_RST} Select: "
+    ui_prompt_select "Select"
 
     case "$REPLY" in
       1) gpg_list_and_show_keys ;;

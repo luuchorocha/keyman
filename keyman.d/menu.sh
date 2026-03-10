@@ -4,16 +4,16 @@ main_menu() {
   init_colors
 
   while :; do
-    ui_screen ""
+    ui_screen "Main Menu"
     ui_println ""
-    ui_println "  ${C_CYN}1${C_RST}  ${C_DIM}│${C_RST}  ${C_BOLD}SSH Keys${C_RST}   ${C_DIM}─────${C_RST}  Manage SSH key pairs"
-    ui_println "  ${C_CYN}2${C_RST}  ${C_DIM}│${C_RST}  ${C_BOLD}GPG Keys${C_RST}   ${C_DIM}─────${C_RST}  Manage GPG signing keys"
+    ui_menu_row "1" "SSH keys" "Inspect, create, and remove SSH key pairs"
+    ui_menu_row "2" "GPG keys" "Inspect, create, export, and delete signing keys"
     ui_println ""
-    ui_println "  ${C_DIM}0${C_RST}  ${C_DIM}│${C_RST}  ${C_DIM}Quit${C_RST}"
+    ui_println "  ${C_DIM}0${C_RST}  ${C_DIM}|${C_RST}  ${C_DIM}Exit${C_RST}"
     ui_println ""
     ui_line
 
-    menu_prompt "  ${C_CYN}▸${C_RST} Select: "
+    ui_prompt_select "Select"
 
     case "$REPLY" in
       1) ssh_menu ;;
