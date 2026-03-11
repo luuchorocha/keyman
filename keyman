@@ -3,10 +3,10 @@
 set -u
 
 SSH_DIR="${SSH_DIR:-"$HOME/.ssh"}"
-KEYMAN_LOG="${KEYMAN_LOG:-}"
 NO_COLOR="${NO_COLOR:-}"
 KEYMAN_DIR="${KEYMAN_DIR:-$(cd "$(dirname "$(realpath $0)")" && pwd)}"
 KEYMAN_LIB="$KEYMAN_DIR/keyman.d"
+KEYMAN_LOG="${KEYMAN_LOG:-$KEYMAN_DIR/keyman.log}"
 VERSION="$(cat "$KEYMAN_LIB/VERSION")"
 
 trap cleanup EXIT
@@ -35,13 +35,21 @@ load() {
   fi
 }
 
-load "help.sh"
-load "cli.sh"
-load "core.sh"
-load "ui.sh"
-load "ssh.sh"
-load "gpg.sh" 
-load "menu.sh"
+run() {
+  load "help.sh"
+  load "cli.sh"
+  load "core.sh"
+  load "ui.sh"
+  load "ssh.sh"
+  load "gpg.sh" 
+  load "menu.sh"
 
-check_arguments $@
-main_menu $@
+  parse_arguments "$@"
+  something broken
+  main_menu "$@"
+}
+
+exec 2>>log/error.log
+exec 1>>log/output.log 
+
+run "$@"
