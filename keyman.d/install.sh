@@ -8,10 +8,12 @@ LIBDIR="${LIBDIR:-$PREFIX/lib}"
 DESTDIR="${DESTDIR:-}"
 APPDIR="${LIBDIR%/}/keyman"
 
-SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && cd .. && pwd)
 SOURCE_APP="$SCRIPT_DIR/keyman"
 SOURCE_LIBDIR="$SCRIPT_DIR/keyman.d"
 MARKER_FILE=".keyman-install-marker"
+
+echo "Installing keyman.. from $SCRIPT_DIR to $APPDIR"
 
 usage() {
   cat <<EOF

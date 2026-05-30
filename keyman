@@ -35,6 +35,26 @@ load() {
   fi
 }
 
+subcommand="${1:-}"
+
+if [ "$subcommand" = "install" ]; then
+  if [ -f "$KEYMAN_LIB/install.sh" ]; then
+    "$KEYMAN_LIB/install.sh"
+    exit 0
+  else
+    printf 'error: install script not found: %s\n' "$KEYMAN_LIB/install.sh" >&2
+    exit 1
+  fi
+elif [ "$subcommand" = "uninstall" ]; then
+  if [ -f "$KEYMAN_LIB/uninstall.sh" ]; then
+    "$KEYMAN_LIB/uninstall.sh"
+    exit 0
+  else
+    printf 'error: uninstall script not found: %s\n' "$KEYMAN_LIB/uninstall.sh" >&2
+    exit 1
+  fi
+fi
+
 load "help.sh"
 load "cli.sh"
 load "core.sh"

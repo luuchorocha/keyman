@@ -1,7 +1,7 @@
 # ----------------- Main -----------------
 
 main_menu() {
-  init_colors
+  ui_init
 
   while :; do
     ui_screen "Main Menu"
