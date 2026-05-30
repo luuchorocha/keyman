@@ -36,12 +36,58 @@ Optional clipboard support uses the first available tool from this list:
 - `wl-copy`
 - `pbcopy`
 
+## Installation
+
+Install `keyman` under `/usr/local`:
+
+```sh
+sudo ./install.sh
+```
+
+That installs:
+
+- a launcher at `/usr/local/bin/keyman`
+- the runtime at `/usr/local/lib/keyman`
+
+After installation, run `keyman` from your `PATH`. The launcher exports
+`KEYMAN_DIR` so the installed script can always find its bundled `keyman.d/`
+runtime directory.
+
+You can override the layout with environment variables:
+
+```sh
+PREFIX=/usr ./install.sh
+DESTDIR=/tmp/pkg PREFIX=/usr ./install.sh
+BINDIR=/opt/bin LIBDIR=/opt/lib ./install.sh
+```
+
+Supported installer variables:
+
+- `PREFIX`: base install prefix. Default: `/usr/local`
+- `BINDIR`: launcher directory. Default: `PREFIX/bin`
+- `LIBDIR`: runtime parent directory. Default: `PREFIX/lib`
+- `DESTDIR`: staging root for packaging installs. Default: unset
+
+Remove an installed copy with the same layout settings you used for installation:
+
+```sh
+sudo ./uninstall.sh
+PREFIX=/usr ./uninstall.sh
+DESTDIR=/tmp/pkg PREFIX=/usr ./uninstall.sh
+```
+
 ## Usage
 
-Run the interactive UI:
+Run the interactive UI from a source checkout:
 
 ```sh
 ./keyman
+```
+
+Run the installed launcher:
+
+```sh
+keyman
 ```
 
 Show help:
@@ -54,6 +100,13 @@ Show version:
 
 ```sh
 ./keyman --version
+```
+
+Show installer help:
+
+```sh
+./install.sh --help
+./uninstall.sh --help
 ```
 
 ## Environment
